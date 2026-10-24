@@ -161,5 +161,13 @@ baBtns.forEach(b => b.addEventListener('click', () => {
   baLabel.textContent = after ? 'После' : 'До';
 }));
 
+/* ---------- свайпы в лайтбоксе ---------- */
+let tx = 0, ty = 0;
+lb.addEventListener('touchstart', e => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+lb.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
+}, { passive: true });
+
 /* год в футере */
 document.getElementById('year').textContent = new Date().getFullYear();
