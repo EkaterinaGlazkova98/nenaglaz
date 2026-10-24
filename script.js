@@ -114,26 +114,46 @@ if (heroImg && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   }, { passive: true });
 }
 
-/* ---------- lightbox ---------- */
+/* ---------- lightbox + предзагрузка ---------- */
 const lb = document.getElementById('lb');
 const lbImg = document.getElementById('lb-img');
 const lbCap = document.getElementById('lb-cap');
 const lbCount = document.getElementById('lb-count');
 const lbTitle = document.getElementById('lb-title');
-let cur = null, idx = 0;
+let cur = null, curKey = null, idx = 0;
+const cache = {};
+function preloadItem(src) {
+  if (cache[src]) return cache[src];
+  const im = new Image();
+  im.decoding = 'async';
+  im.src = W + src;
+  cache[src] = im;
+  return im;
+}
+function preloadAround(key, i) {
+  const it = GALLERIES[key].items, n = it.length;
+  [(i - 1 + n) % n, (i + 1) % n].forEach(j => preloadItem(it[j][0]));
+}
+function preloadAll(key) { GALLERIES[key].items.forEach(([f]) => preloadItem(f)); }
 
 function openGallery(key, i = 0) {
   cur = GALLERIES[key]; if (!cur) return;
-  idx = i; render(); lb.classList.add('open');
+  curKey = key; idx = i; render(); lb.classList.add('open');
   document.body.style.overflow = 'hidden';
+  preloadAround(key, idx);
+  setTimeout(() => preloadAll(key), 200);
 }
 function render() {
   const [src, cap] = cur.items[idx];
+  lb.classList.add('loading');
+  lbImg.classList.remove('ready');
+  lbImg.onload = () => { lbImg.classList.add('ready'); lb.classList.remove('loading'); };
+  if (cache[src] && cache[src].complete) { lbImg.onload(); }
   lbImg.src = W + src; lbImg.alt = cap; lbCap.textContent = cap;
   lbCount.textContent = (idx + 1) + ' / ' + cur.items.length;
   lbTitle.textContent = cur.title;
 }
-function step(d) { idx = (idx + d + cur.items.length) % cur.items.length; render(); }
+function step(d) { idx = (idx + d + cur.items.length) % cur.items.length; render(); preloadAround(curKey, idx); }
 function closeLb() { lb.classList.remove('open'); document.body.style.overflow = ''; }
 
 document.querySelectorAll('[data-gallery]').forEach(el =>
@@ -148,18 +168,6 @@ addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') step(1);
   if (e.key === 'ArrowLeft') step(-1);
 });
-
-/* ---------- до / после ---------- */
-const baBtns = document.querySelectorAll('.ba-switch button');
-const baImgs = document.querySelectorAll('.ba-frame img');
-const baLabel = document.getElementById('ba-label');
-baBtns.forEach(b => b.addEventListener('click', () => {
-  baBtns.forEach(x => x.classList.toggle('on', x === b));
-  const after = b.dataset.mode === 'after';
-  baImgs[0].classList.toggle('show', !after);
-  baImgs[1].classList.toggle('show', after);
-  baLabel.textContent = after ? 'После' : 'До';
-}));
 
 /* ---------- свайпы в лайтбоксе ---------- */
 let tx = 0, ty = 0;

@@ -274,3 +274,9 @@ footer{border-top:1px solid var(--line);padding:44px 0 130px;color:var(--mut);fo
   .rev-shots::-webkit-scrollbar{display:none}
   .rev-shot{flex:0 0 88%;scroll-snap-align:start}
 }
+
+/* ---- v13: плавное появление кадра и спиннер в лайтбоксе ---- */
+#lb-img{opacity:0;transition:opacity .3s ease}
+#lb-img.ready{opacity:1}
+.lb.loading::after{content:'';position:absolute;top:50%;left:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid rgba(255,255,255,.22);border-top-color:var(--acc);border-radius:50%;animation:lbspin .8s linear infinite;z-index:2}
+@keyframes lbspin{to{transform:rotate(360deg)}}
