@@ -267,3 +267,10 @@ footer{border-top:1px solid var(--line);padding:44px 0 130px;color:var(--mut);fo
 .rev-shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;align-items:start;overflow:visible}
 .rev-shot{flex:none;width:auto}
 .rev-shot img{width:100%;height:auto;object-fit:contain}
+
+/* ---- v12: отзывы каруселью на мобильных ---- */
+@media(max-width:900px){
+  .rev-shots{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;margin:0 -22px;padding:4px 22px 18px;scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;align-items:flex-start}
+  .rev-shots::-webkit-scrollbar{display:none}
+  .rev-shot{flex:0 0 88%;scroll-snap-align:start}
+}
