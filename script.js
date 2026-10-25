@@ -179,3 +179,28 @@ lb.addEventListener('touchend', e => {
 
 /* год в футере */
 document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- цели Метрики: клики по мессенджерам и звонку ---------- */
+function goal(name){ try { if (window.ym) ym(113778870, 'reachGoal', name); } catch(e){} }
+document.addEventListener('click', function(e){
+  var a = e.target.closest ? e.target.closest('a') : null;
+  if (!a) return;
+  var h = a.getAttribute('href') || '';
+  if (h.indexOf('t.me/') !== -1) goal('tg_click');
+  else if (h.indexOf('wa.me/') !== -1) goal('wa_click');
+  else if (h.indexOf('max.ru/') !== -1) goal('max_click');
+  else if (h.indexOf('instagram.com/') !== -1) goal('ig_click');
+  else if (h.indexOf('tel:') === 0) goal('call_click');
+});
+
+/* ---------- воронка: доскроллил до ключевых секций ---------- */
+['portfolio', 'reviews', 'contact'].forEach(function (id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var sent = false;
+  new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting && !sent) { sent = true; goal('view_' + id); }
+    });
+  }, { threshold: .4 }).observe(el);
+});
